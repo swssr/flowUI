@@ -1,11 +1,46 @@
 {
-  "name": "flowui",
-  "version": "1.0.0",
-  "description": "SwiftUI inspired component library",
-  "main": "index.js",
+  "name": "@notswssr/flowui",
+  "version": "0.0.1",
+  "description": "A SwiftUI-inspired library for building web interfaces with a fluent API",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "jest",
+    "prepublishOnly": "npm run build"
   },
-  "author": "",
-  "license": "ISC"
+  "keywords": [
+    "ui",
+    "swiftui",
+    "web-components",
+    "frontend",
+    "typescript",
+    "declarative"
+  ],
+  "author": {
+    "name": "Simo Ngquseka",
+    "email": "simo@swssr.co",
+    "url": "https://swssr.co"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.2.2",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1",
+    "@types/jest": "^29.5.5"
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/swssr/flowui.git"
+  },
+  "bugs": {
+    "url": "https://github.com/swssr/flowui/issues"
+  },
+  "homepage": "https://github.com/swssr/flowui#readme"
 }
