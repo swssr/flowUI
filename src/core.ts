@@ -506,6 +506,14 @@ export function Slider(value: State<number>, range: { min: number, max: number, 
   return slider;
 }
 
+// TODO: Might need to make this ImageAsync that can be lazy loaded and can validate it's url.
+export function Image(src: string): UIComponent {
+  const image =  new UIComponent('img').style({ width: '100%', height: '100%' })
+  image.getElement.setAttribute('src', src);
+
+  return image;
+}
+
 // #endregion
 
 
