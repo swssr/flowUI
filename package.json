@@ -23,6 +23,9 @@
     "email": "simo@swssr.co",
     "url": "https://swssr.co"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "license": "MIT",
   "devDependencies": {
     "typescript": "^5.2.2",
