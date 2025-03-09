@@ -15,9 +15,14 @@ export default class UIComponent<TElement = HTMLElement> {
   private children: UIComponent[] = [];
   private useShadowDOM: boolean = false;
   private stateUnsubscribers: Array<() => void> = [];
+  private componentId: string;
+  private styleRules: Map<string, Record<string, any>> = new Map();
 
   constructor(tagName: string = "div") {
     this.element = document.createElement(tagName);
+    // Generate a unique id as component is being built
+    this.componentId = `c-${crypto.randomUUID().substring(0, 8)}`
+    this.element.classList.add(this.componentId);
   }
 
   // Clean up bro
@@ -107,12 +112,13 @@ export default class UIComponent<TElement = HTMLElement> {
   }
 
   style(styles: string | Record<string, any>): UIComponent {
-    if (typeof styles === "string") {
+    if(typeof styles === "string") {
       this.styleSheet = styles;
-    }
-
-    if (typeof styles === "object") {
-      Object.assign(this.styles, styles);
+    } else if(typeof styles === "object") {
+      // convert to class based styles
+      const className = this.generateClassName(`style-${Object.keys(styles).join("-")}`);
+      this.styleRules.set(className, styles);
+      this.element.classList.add(className);
     }
 
     return this;
@@ -132,6 +138,10 @@ export default class UIComponent<TElement = HTMLElement> {
   setAttribute(name: string, value: string): UIComponent {
     this.element.setAttribute(name, value);
     return this;
+  }
+
+  private generateClassName(ruleName: string): string {
+    return `${crypto.randomUUID().substring(0, 8)}-${ruleName}`;
   }
 
   // Structure method
@@ -187,46 +197,55 @@ export default class UIComponent<TElement = HTMLElement> {
 
 
   // !!Remember: Look up how signals work, and how to implement them
+  // Update the render method to handle class-based styles
   render(): HTMLElement {
+    // First apply any direct styles that weren't converted to classes
     Object.assign(this.element.style, this.styles);
-
-    if (this.useShadowDOM) {
-      const shadow = this.element.attachShadow({ mode: "open" });
-
-      if (this.styleSheet) {
-        const style = document.createElement("style");
-        style.textContent = this.styleSheet;
-        shadow.appendChild(style);
-      }
-
-      // Render children
-      const container = document.createElement("div");
-      shadow.appendChild(container);
-
-      this.children.forEach(child => container.appendChild(child.render()));
-
-    } else {
+    
+    // Create style element if we have style rules
+    if (this.styleRules.size > 0 || this.styleSheet) {
       const style = document.createElement("style");
-      const scopeId = crypto.randomUUID() ?? `component-${Math.random().toString(36).substring(7)}`;
-      this.element.setAttribute("data-component-id", scopeId);
-
-      // Scope all styles to this component
-      style.textContent = this.styleSheet
-        .split('}')
-        .map(rule => rule.trim())
-        .filter(rule => rule.length > 0)
-        .map(rule => {
-          const [selector, ...rest] = rule.split('{');
-          return `[data-component-id="${scopeId}"] ${selector.trim()} {${rest.join('{')}}`;
-        })
-        .join('}');
-
-      this.element.appendChild(style);
+      
+      // Add all class-based rules
+      let cssText = '';
+      
+      // Add our generated style rules
+      this.styleRules.forEach((styleObj, className) => {
+        cssText += `.${className} {\n`;
+        Object.entries(styleObj).forEach(([prop, value]) => {
+          // Convert camelCase to kebab-case
+          const cssProp = prop.replace(/([A-Z])/g, '-$1').toLowerCase();
+          cssText += `  ${cssProp}: ${value};\n`;
+        });
+        cssText += '}\n';
+      });
+      
+      if (this.styleSheet) {
+        // Scope the styles to this component
+        cssText += this.styleSheet
+          .split('}')
+          .map(rule => rule.trim())
+          .filter(rule => rule.length > 0)
+          .map(rule => {
+            const [selector, ...rest] = rule.split('{');
+            return `.${this.componentId} ${selector.trim()} {${rest.join('{')}}\n`;
+          })
+          .join('}');
+      }
+      
+      cssText = `@layer components.${this.componentId} {\n${cssText}\n}`;
+      
+      style.textContent = cssText;
+      document.head.appendChild(style);
+      
+      this.stateUnsubscribers.push(() => {
+        document.head.removeChild(style);
+      });
     }
-
-
+    
+    // Continue with the rest of the render process
     this.children.forEach(child => this.element.appendChild(child.render()));
-
+    
     return this.element;
   }
 }
