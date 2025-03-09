@@ -6,8 +6,8 @@ export {
     // Core classes
     Color,
     Font,
-    State,
     UIComponent,
+    State,
     
     // Layout components
     VStack,
