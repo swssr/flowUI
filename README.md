@@ -13,7 +13,7 @@ function Counter() {
   return VStack(
     Text("Counter")
       .font(.headline)
-      .padding(".bottom", 20),
+      .padding("bottom", 20),
       
     Button("+")
       .onTap(() => count.value++)
@@ -83,7 +83,7 @@ function Counter() {
   return VStack(
     Text("Counter")
       .font(Font.headline())
-      .padding(".bottom", 20),
+      .padding("bottom", 20),
       
     Button("Increment")
       .onTap(() => count.value++)
@@ -139,13 +139,13 @@ VStack(
     .font(Font.headline()),
     
   TextField("Username")
-    .padding(".bottom", 10),
+    .padding("bottom", 10),
     
   TextField("Password")
-    .padding(".bottom", 20),
+    .padding("bottom", 20),
     
   Toggle(rememberMe)
-    .padding(".bottom", 20),
+    .padding("bottom", 20),
     
   Button("Sign In")
     .padding(10)
@@ -270,3 +270,31 @@ applyThemeToDocument(customTheme);
 Create your own components by composing existing ones:
 
 ```## Coming soon``
+
+
+## Development
+
+### Quick Start
+
+1. Clone the repository
+2. Install dependencies: `pnpm install`
+3. Start development server: `pnpm dev:all`
+
+This will:
+- Start the TypeScript compiler in watch mode
+- Launch a development server at http://localhost:5173
+
+### Development Commands
+
+- `pnpm dev` - Start the development server only
+- `pnpm watch` - Start TypeScript in watch mode only
+- `pnpm dev:all` - Start both simultaneously
+- `pnpm build` - Build the library
+- `pnpm test` - Run tests
+
+### How to Test Components
+
+1. Add your test components to `dev/app.ts`
+2. Create containers in `dev/index.html` 
+3. Mount your components to test them
+4. Changes to source files will automatically reload the page

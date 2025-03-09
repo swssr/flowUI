@@ -1,5 +1,9 @@
-import { DotEdge, EdgeValue, Font, State } from ".";
+import { EdgeValue, Font, State } from ".";
 import Color from "./color";
+
+
+type EventOf<T extends HTMLElement> = T extends HTMLInputElement ? Event & { target: T } : Event;
+type ValueOf<T> = T extends { value: infer V } ? V : never;
 
 // THis shit will probably become complex in the future. I wanna also learn how signals are implemented.
 // So brewing complexity - might end up moving to own submodule
@@ -29,7 +33,8 @@ export default class UIComponent<TElement = HTMLElement> {
   // What inspired this whole thing. was interested in how SwiftUI automatically know what to show as option
   // based on the param index type when you .<?>
   // Basic style Modifiers
-  padding(edgeOrValue?: DotEdge | number, value?: number): UIComponent {
+
+  padding(edgeOrValue?: EdgeValue | number & {}, value?: number): UIComponent {
     if (edgeOrValue === undefined) {
       this.styles.padding = "10px"; // Should move to constants
     } else if (typeof edgeOrValue === "number") {
@@ -132,13 +137,19 @@ export default class UIComponent<TElement = HTMLElement> {
     return this;
   }
 
-  onChange(handler: (e: Event) => void): UIComponent {
-    this.element.addEventListener("change", handler);
+  onChange(handler: (value: any, e: Event) => void): UIComponent {
+    this.element.addEventListener("change", event => {
+      const element = event.target as typeof this.element & { value: any };
+      handler(element?.value, event);
+    });
     return this;
   }
 
-  onInput(handler: (e: Event) => void): UIComponent {
-    this.element.addEventListener("input", handler);
+  onInput(handler: (value: any, e: EventOf<HTMLInputElement>) => void): UIComponent {
+    this.element.addEventListener("input", (event) => {
+      const element = event.target as HTMLInputElement;
+      handler(element.value, event as EventOf<HTMLInputElement>);
+    });
     return this;
   }
 

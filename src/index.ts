@@ -1,7 +1,6 @@
 export {
     // Types
     EdgeValue,
-    DotEdge,
     
     // Core classes
     Color,

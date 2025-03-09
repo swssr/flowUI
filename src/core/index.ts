@@ -6,7 +6,8 @@ export { default as State } from "./state";
 export { default as Color } from "./color";
 
 export type EdgeValue = "top" | "bottom" | "leading" | "trailing" | "all" | "horizontal" | "vertical";
-export type DotEdge = `${EdgeValue}`;
+// export type DotEdge = `.${EdgeValue}`;
+
 
 
 export class Font {
