@@ -120,6 +120,16 @@ export default class UIComponent<TElement = HTMLElement> {
     return this;
   }
 
+  html(content: string): UIComponent {
+    this.element.innerHTML = content;
+    return this;
+  }
+
+  setAttribute(name: string, value: string): UIComponent {
+    this.element.setAttribute(name, value);
+    return this;
+  }
+
   // Structure method
   add(...components: UIComponent[]): UIComponent {
     this.children.push(...components);

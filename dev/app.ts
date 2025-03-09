@@ -1,16 +1,18 @@
-import { Button, Color, mount, Spacer, State, TextField, Text, VStack, HStack }  from "../src/index";
+import { Button, Color, mount, Spacer, State, TextField, Text, VStack, HStack, Toggle } from "../src/index";
 
 
 function CounterExample() {
     const state = new State({ count: 0 });
 
+    const CountButton = (label: string, value: number) => Button(label)
+        .onTap(() => state.value.count = value)
+        .padding("all", 10)
+        .foregroundColor(Color.white)
+        .backgroundColor(Color.blue)
+        .cornerRadius(6);
+
     return HStack(
-        Button("-")
-            .onTap(() => state.value.count--)
-            .padding("all", 10)
-            .foregroundColor(Color.white)
-            .backgroundColor(Color.blue)
-            .cornerRadius(6),
+        CountButton("-", state.value.count--),
 
         Text("Count")
             .backgroundColor(Color.white)
@@ -20,12 +22,7 @@ function CounterExample() {
                 console.log("Count: ", value.count);
             }),
 
-        Button("+")
-            .onTap(() => state.value.count++)
-            .padding("all", 10)
-            .foregroundColor(Color.white)
-            .backgroundColor(Color.blue)
-            .cornerRadius(6),
+        CountButton("+", state.value.count++),
     )
 }
 
@@ -62,14 +59,8 @@ function FormApp() {
             .foregroundColor(Color.white)
             .backgroundColor(Color.blue)
             .cornerRadius(6),
-            
-            
-        Text("")
-            .bind(submitted, (value, component) => {
-                component.text(value ? "Form submitted" : "");
-            })
-            .padding("top", 10)
     )
+        .padding("horizontal", 20);
 
 }
 

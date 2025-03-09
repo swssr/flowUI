@@ -122,8 +122,8 @@ export function Button(label: string): UIComponent {
 
 export function TextField(placeholder: string = ""): UIComponent {
   const input = new UIComponent("input");
-  input.getElement.setAttribute("placeholder", placeholder);
-  input.getElement.setAttribute("type", "text");
+  input.setAttribute("placeholder", placeholder);
+  input.setAttribute("type", "text");
   input.bind
 
   return input.style(`
@@ -229,10 +229,19 @@ export function Slider(value: State<number>, range: { min: number, max: number, 
 
 // TODO: Might need to make this ImageAsync that can be lazy loaded and can validate it's url.
 export function Image(src: string): UIComponent {
-  const image = new UIComponent('img').style({ width: '100%', height: '100%' })
-  image.getElement.setAttribute('src', src);
+  return new UIComponent('img').style({ width: '100%', height: '100%' })
+  .setAttribute('src', src);
+}
 
-  return image;
+
+export function Link(label: string, href: string): UIComponent {
+  return new UIComponent('a')
+    .text(label)
+    .style({
+      color: '#007AFF',
+      textDecoration: 'none'
+    })
+    .setAttribute('href', href);
 }
 
 // #endregion
