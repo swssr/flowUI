@@ -43,7 +43,7 @@ mount(Counter(), "#app");
 ## Installation
 
 ```bash
-npm install flowui
+npm install @notswssr/flowui
 ```
 
 ## Basic Usage
