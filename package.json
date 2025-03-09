@@ -1,6 +1,6 @@
 {
   "name": "@notswssr/flowui",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A SwiftUI-inspired library for building web interfaces with a fluent API",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
