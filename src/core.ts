@@ -139,7 +139,7 @@ export class State<T> {
   }
 
   // Move to utils
-  isSame(value1, value2): boolean {
+  isSame(value1: any, value2: any): boolean {
     return JSON.stringify(value1) === JSON.stringify(value2);
   }
 }
