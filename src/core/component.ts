@@ -4,7 +4,6 @@ import Color from "./color";
 // THis shit will probably become complex in the future. I wanna also learn how signals are implemented.
 // So brewing complexity - might end up moving to own submodule
 
-
 export default class UIComponent<TElement = HTMLElement> {
   private element: HTMLElement;
   private styles: Record<string, any> = {};
