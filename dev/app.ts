@@ -1,17 +1,26 @@
-import { Button, Color, mount, Spacer, State, TextField, Text, VStack }  from "../src/index";
+import { Button, Color, mount, Spacer, State, TextField, Text, VStack, HStack }  from "../src/index";
 
 
 function CounterExample() {
     const state = new State({ count: 0 });
 
-    return VStack(
-        TextField("Hello World")
+    return HStack(
+        Button("-")
+            .onTap(() => state.value.count--)
+            .padding("all", 10)
+            .foregroundColor(Color.white)
+            .backgroundColor(Color.blue)
+            .cornerRadius(6),
+
+        Text("Count")
             .backgroundColor(Color.white)
-            .foregroundColor(Color.black),
+            .foregroundColor(Color.black)
+            .bind(state, (value, component) => {
+                component.text(value.count);
+                console.log("Count: ", value.count);
+            }),
 
-        Spacer(),
-
-        Button("Click Me")
+        Button("+")
             .onTap(() => state.value.count++)
             .padding("all", 10)
             .foregroundColor(Color.white)
@@ -65,12 +74,5 @@ function FormApp() {
 }
 
 
-document.addEventListener("DOMContentLoaded", () => {
-    try {
-        mount(CounterExample(), "#counter-app");
-        mount(FormApp(), "#counter-app");
-    } catch (error) {
-        console.error("Error mounting examples: ", error);
-    }
-})
-mount(CounterExample(), "#app");
+mount(CounterExample(), "#counter-app");
+mount(FormApp(), "#form-app");

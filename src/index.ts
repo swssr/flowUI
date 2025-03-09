@@ -1,6 +1,6 @@
 export {
     // Types
-    EdgeValue,
+    type EdgeValue,
     
     // Core classes
     Color,

@@ -9,7 +9,6 @@ export type EdgeValue = "top" | "bottom" | "leading" | "trailing" | "all" | "hor
 // export type DotEdge = `.${EdgeValue}`;
 
 
-
 export class Font {
   private value: string;
 
@@ -125,6 +124,7 @@ export function TextField(placeholder: string = ""): UIComponent {
   const input = new UIComponent("input");
   input.getElement.setAttribute("placeholder", placeholder);
   input.getElement.setAttribute("type", "text");
+  input.bind
 
   return input.style(`
     :host {

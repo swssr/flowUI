@@ -115,8 +115,8 @@ export default class UIComponent<TElement = HTMLElement> {
   }
 
   // #region Content methods
-  text(content: string): UIComponent {
-    this.element.textContent = content;
+  text(content: string | number): UIComponent {
+    this.element.textContent = content as string;
     return this;
   }
 
@@ -157,6 +157,7 @@ export default class UIComponent<TElement = HTMLElement> {
   // State binding
   bind<T>(state: State<T>, updateFn: (value: T, component: UIComponent) => void): UIComponent {
     // Initial update
+    console.log("Initial update", state.value);
     updateFn(state.value, this);
 
     // Subscribe to state
