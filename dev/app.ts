@@ -2,28 +2,31 @@ import { Button, Color, mount, Spacer, State, TextField, Text, VStack, HStack, T
 
 
 function CounterExample() {
-    const state = new State({ count: 0 });
+    const counter = new State(0);
 
-    const CountButton = (label: string, value: number) => Button(label)
-        .onTap(() => state.value.count = value)
+    const CountButton = (label: string) => Button(label)
         .padding("all", 10)
         .foregroundColor(Color.white)
         .backgroundColor(Color.blue)
         .cornerRadius(6);
 
     return HStack(
-        CountButton("-", state.value.count--),
+        CountButton("-")
+            .onTap(() => counter.value--),
 
         Text("Count")
             .backgroundColor(Color.white)
             .foregroundColor(Color.black)
-            .bind(state, (value, component) => {
-                component.text(value.count);
-                console.log("Count: ", value.count);
-            }),
+            .bindTo(counter),
 
-        CountButton("+", state.value.count++),
+        counter
+            .format(x => `Hello, the count is: ${x}`)
+            .to(Text("")),
+
+        CountButton("+")
+            .onTap(() => counter.value++),
     )
+    .frame({ width: "100%" })
 }
 
 

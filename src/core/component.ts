@@ -26,6 +26,10 @@ export default class UIComponent<TElement = HTMLElement> {
     this.children.forEach(child => child.dispose());
   }
 
+  addUnsub(func: () => void) {
+    this.stateUnsubscribers.push(func)
+  }
+
   get getElement(): HTMLElement {
     return this.element;
   }
@@ -175,6 +179,10 @@ export default class UIComponent<TElement = HTMLElement> {
     this.stateUnsubscribers.push(unsub);
 
     return this;
+  }
+
+  bindTo<T>(state: State<T>): UIComponent {
+    return state.to(this);
   }
 
 
