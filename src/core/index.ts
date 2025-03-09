@@ -65,17 +65,17 @@ export class Font {
 
 // #region Layout COmponensts 
 export function VStack(...children: UIComponent[]): UIComponent {
-  const stack = new UIComponent("div").style("display: flex; flex-direction: column")
+  const stack = new UIComponent("div").style({ display: "flex", flexDirection: "column" })
   return stack.add(...children);
 }
 
 export function HStack(...children: UIComponent[]): UIComponent {
-  const stack = new UIComponent("div").style("display: flex; flex-direction: row")
+  const stack = new UIComponent("div").style({ display: "flex", flexDirection: "row" })
   return stack.add(...children);
 }
 
 export function ZStack(...children: UIComponent[]): UIComponent {
-  const stack = new UIComponent("div").style("position: relative")
+  const stack = new UIComponent("div").style({ position: "relative" })
 
   children.forEach((child, index) => {
     child.style({ position: "absolute", inset: 0, zIndex: index })
@@ -89,7 +89,7 @@ export function Spacer(): UIComponent {
 }
 
 export function Divider(): UIComponent {
-  return new UIComponent("div").style("border-top: 1px solid #8E8E93");
+  return new UIComponent("div").style({"border-top": "1px solid #8E8E93" });
 }
 
 // Basic component
