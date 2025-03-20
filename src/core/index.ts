@@ -89,7 +89,7 @@ export function Spacer(gap: number = 1): UIComponent {
 }
 
 export function Divider(): UIComponent {
-  return new UIComponent("hr");
+  return new UIComponent("hr").style({ flex: "1", width: "100%" });
 }
 
 // Basic component
