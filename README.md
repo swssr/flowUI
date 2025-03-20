@@ -1,6 +1,7 @@
 # FlowUI
 
 A SwiftUI-inspired library for building web interfaces with a fluent API.
+- v0.0.5
 
 > All wishful thing for now :')
 
