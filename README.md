@@ -29,6 +29,41 @@ function Counter() {
 mount(Counter(), "#app");
 ```
 
+A bit more advance counter with new two data binding
+```typescript
+function CounterExample() {
+    const counter = new State(0);
+
+    const CountButton = (label: string) => Button(label)
+        .padding("all", 10)
+        .foregroundColor(Color.white)
+        .backgroundColor(Color.blue)
+        .frame({ width: "max-content" })
+        .cornerRadius(6)
+
+    return HStack(
+        CountButton("-")
+            .onTap(() => counter.value--),
+
+        Text("Count")
+            .foregroundColor(Color.red)
+            .bindTo(counter),
+
+        CountButton("+")
+            .onTap(() => counter.value++),
+
+        Divider(),
+
+        // You can now transform state into a component e.g text node and also format the value like below
+        counter
+            .format(x => `Hello, the count is: ${x}`)
+            .to(Text("")),
+    )
+    .frame({ width: "100%" })
+}
+
+```
+
 ## Features
 
 - 🔗 **Fluent API**: Chainable, SwiftUI-inspired syntax

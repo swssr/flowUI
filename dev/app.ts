@@ -24,14 +24,10 @@ function CounterExample() {
             .onTap(() => counter.value++),
 
         Divider(),
-
-        HStack(
-            counter
+        
+        counter
             .format(x => `Hello, the count is: ${x}`)
             .to(Text("")),
-        )
-        .padding(10)
-        .border(1, Color.black.opacity(.1))
     )
     .frame({ width: "100%" })
 }
