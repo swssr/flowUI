@@ -93,7 +93,7 @@ export function Divider(): UIComponent {
 }
 
 // Basic component
-export function Text(content: string): UIComponent {
+export function Text(content: string = ""): UIComponent {
   return new UIComponent("span").text(content);
 }
 

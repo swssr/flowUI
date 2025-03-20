@@ -1,4 +1,4 @@
-import { Divider } from "../src/core";
+import { Divider, Font } from "../src/core";
 import { Button, Color, mount, Spacer, State, TextField, Text, VStack, HStack, Toggle } from "../src/index";
 
 
@@ -12,24 +12,29 @@ function CounterExample() {
         .frame({ width: "max-content" })
         .cornerRadius(6)
 
-    return HStack(
-        CountButton("-")
-            .onTap(() => counter.value--),
+    return VStack(
+        Text("Counter Example")
+            .font(Font.headline()),
 
-        Text("Count")
-            .foregroundColor(Color.red)
-            .bindTo(counter),
-
-        CountButton("+")
-            .onTap(() => counter.value++),
-
-        Divider(),
-        
-        counter
-            .format(x => `Hello, the count is: ${x}`)
-            .to(Text("")),
+        HStack(
+            CountButton("-")
+                .onTap(() => counter.value--),
+    
+            Text()
+                .foregroundColor(Color.red)
+                .to(counter),
+    
+            CountButton("+")
+                .onTap(() => counter.value++),
+    
+            Divider(),
+    
+            counter
+                .format(x => `Hello, the count is: ${x}`)
+                .to(Text("")),
+        )
+        .frame({ width: "100%" }),
     )
-    .frame({ width: "100%" })
 }
 
 

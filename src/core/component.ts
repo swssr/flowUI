@@ -191,7 +191,10 @@ export default class UIComponent<TElement = HTMLElement> {
     return this;
   }
 
-  bindTo<T>(state: State<T>): UIComponent {
+  /**
+   * formerly bindTo state
+   */
+  to<T>(state: State<T>): UIComponent {
     return state.to(this);
   }
 
