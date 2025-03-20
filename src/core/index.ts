@@ -65,31 +65,31 @@ export class Font {
 
 // #region Layout COmponensts 
 export function VStack(...children: UIComponent[]): UIComponent {
-  const stack = new UIComponent("div").style({ display: "flex", flexDirection: "column" })
+  const stack = new UIComponent().style({ display: "flex", flexDirection: "column", height: "100%" })
   return stack.add(...children);
 }
 
 export function HStack(...children: UIComponent[]): UIComponent {
-  const stack = new UIComponent("div").style({ display: "flex", flexDirection: "row" })
+  const stack = new UIComponent().style({ display: "flex", flexDirection: "row" })
   return stack.add(...children);
 }
 
 export function ZStack(...children: UIComponent[]): UIComponent {
-  const stack = new UIComponent("div").style({ position: "relative" })
+  const stack = new UIComponent().style({ position: "relative" })
 
   children.forEach((child, index) => {
-    child.style({ position: "absolute", inset: 0, zIndex: index })
+    child.style({position: "absolute", inset: "0"})
   })
 
   return stack.add(...children);
 }
 
-export function Spacer(): UIComponent {
-  return new UIComponent("div").style("flex: 1");
+export function Spacer(gap: number = 1): UIComponent {
+  return new UIComponent("div").style(`:host{display: block;flex: ${gap}}`);
 }
 
 export function Divider(): UIComponent {
-  return new UIComponent("div").style({"border-top": "1px solid #8E8E93" });
+  return new UIComponent("hr");
 }
 
 // Basic component
@@ -100,22 +100,29 @@ export function Text(content: string): UIComponent {
 export function Button(label: string): UIComponent {
   return new UIComponent("button")
     .text(label)
-    .style(`
-      :host {
+    .style(/*css*/`
+      button {
+        --bg: #0062CC;
+        --color: #ffffff;
         cursor: pointer;
         border: none;
-        background-color: #0A84FF;
         color: white;
         border-radius: 6px;
         padding: 8px 16px;
         font-weight: 600;
-      }
+        cursor: pointer;
+        outline: none;
+        border: none;
+        width: 100%;
+        background-color: var(--bg);
 
-      :host:hover {
-        background-color: #0062CC;
-      }
-      :host:active {
-        background-color: #004999;
+        &:hover {
+          --bg:#0e6acc;
+        }
+
+        &:active {
+          --bg: #004999;
+        }
       }
     `)
 }
@@ -126,8 +133,8 @@ export function TextField(placeholder: string = ""): UIComponent {
   input.setAttribute("type", "text");
   input.bind
 
-  return input.style(`
-    :host {
+  return input.style(/*css*/`
+    input {
       padding: 8px;
       border-radius: 6px;
       border: 1px solid #c0c0c0;
@@ -135,7 +142,7 @@ export function TextField(placeholder: string = ""): UIComponent {
       width: 100%;
       box-sizing: border-box;
     }
-    :host:focus {
+    input:focus {
       outline: none;
       border-color: #007AFF;
     }
@@ -144,7 +151,7 @@ export function TextField(placeholder: string = ""): UIComponent {
 
 export function Toggle(isOn: State<boolean>): UIComponent {
   const toggle = new UIComponent('label')
-    .style(`
+    .style(/*css*/`
       :host {
         position: relative;
         display: inline-block;

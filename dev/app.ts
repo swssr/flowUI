@@ -9,19 +9,21 @@ function CounterExample() {
         .padding("all", 10)
         .foregroundColor(Color.white)
         .backgroundColor(Color.blue)
-        .cornerRadius(6);
+        .frame({ width: "max-content" })
+        .cornerRadius(6)
 
     return HStack(
         CountButton("-")
             .onTap(() => counter.value--),
 
         Text("Count")
-            .backgroundColor(Color.white)
-            .foregroundColor(Color.black)
+            .foregroundColor(Color.red)
             .bindTo(counter),
 
         CountButton("+")
             .onTap(() => counter.value++),
+
+        Divider(),
 
         HStack(
             counter
@@ -64,11 +66,9 @@ function FormApp() {
                 confirm("Form data: " + JSON.stringify(state.value));
             })
             .padding("all", 10)
-            .foregroundColor(Color.white)
-            .backgroundColor(Color.blue)
             .cornerRadius(6),
     )
-        .padding("horizontal", 20);
+    .padding("horizontal", 20)
 
 }
 

@@ -5,21 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FlowUI Development</title>
 </head>
+
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+  }
+  html {
+    height: 100dvh;
+  }
+
+  body {
+    --gutter: min(10vw, 200px);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 0 var(--gutter);
+    align-items: start;
+    place-content: start;
+    > * {
+      display: grid;
+      width: 100%;
+    }
+  }
+  header {
+    margin-bottom: 1em;
+  }
+  .example {
+    padding: 1em;
+    background: #f7f7f7;
+    margin-bottom: 1em;
+    border-radius: 4px;
+  }
+</style>
+
 <body>
-    <div class="header">
-        <h1>FlowUI Development</h1>
-        <p>Use this page to test components as you build them</p>
-      </div>
-      
-      <div class="example">
-        <h2 class="title">Counter Example</h2>
-        <div id="counter-app"></div>
-      </div>
-      
-      <div class="example">
-        <h2 class="title">Form Example</h2>
-        <div id="form-app"></div>
-      </div>
+    <header>
+      <h1>FlowUI Development</h1>
+      <p>Use this page to test components as you build them</p>
+    </header>
+    
+    <div class="example">
+      <h2 class="title">Counter Example</h2>
+      <div id="counter-app"></div>
+    </div>
+    
+    <div class="example">
+      <h2 class="title">Form Example</h2>
+      <div id="form-app"></div>
     </div>
 
     <script type="module" src="./app.ts"></script>

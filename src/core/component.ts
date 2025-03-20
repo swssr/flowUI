@@ -1,51 +1,61 @@
 import { EdgeValue, Font, State } from ".";
 import Color from "./color";
 
-
 type EventOf<T extends HTMLElement> = T extends HTMLInputElement ? Event & { target: T } : Event;
 type ValueOf<T> = T extends { value: infer V } ? V : never;
 
-// THis shit will probably become complex in the future. I wanna also learn how signals are implemented.
-// So brewing complexity - might end up moving to own submodule
+type CSSProperties = { 
+  [K in keyof CSSStyleDeclaration as K extends string ? (CSSStyleDeclaration[K] extends Function ? never : K) : never]?: CSSStyleDeclaration[K]
+} & Record<string, any>;
+
+type NonEmptyCSSProperties = CSSProperties & { [key: string]: unknown };
 
 export default class UIComponent<TElement = HTMLElement> {
   private element: HTMLElement;
+  private customElement: HTMLElement;
   private styles: Record<string, any> = {};
   private styleSheet: string = "";
   private children: UIComponent[] = [];
-  private useShadowDOM: boolean = false;
   private stateUnsubscribers: Array<() => void> = [];
   private componentId: string;
   private styleRules: Map<string, Record<string, any>> = new Map();
+  private shadowRoot: ShadowRoot | null = null;
 
   constructor(tagName: string = "div") {
+    this.componentId = `f-${crypto.randomUUID().substring(0, 8)}`;
+    
+    if (!customElements.get(this.componentId)) {
+      class CustomElement extends HTMLElement {
+        constructor() {
+          super();
+        }
+      }
+      
+      customElements.define(this.componentId, CustomElement);
+    }
+    
+    this.customElement = document.createElement(this.componentId);
     this.element = document.createElement(tagName);
-    // Generate a unique id as component is being built
-    this.componentId = `c-${crypto.randomUUID().substring(0, 8)}`
-    this.element.classList.add(this.componentId);
+    this.shadowRoot = this.customElement.attachShadow({ mode: 'open' });
+    this.shadowRoot.appendChild(this.element);
   }
 
-  // Clean up bro
   dispose(): void {
     this.stateUnsubscribers.forEach(unsub => unsub());
     this.children.forEach(child => child.dispose());
   }
 
   addUnsub(func: () => void) {
-    this.stateUnsubscribers.push(func)
+    this.stateUnsubscribers.push(func);
   }
 
   get getElement(): HTMLElement {
     return this.element;
   }
 
-  // What inspired this whole thing. was interested in how SwiftUI automatically know what to show as option
-  // based on the param index type when you .<?>
-  // Basic style Modifiers
-
   padding(edgeOrValue?: EdgeValue | number & {}, value?: number): UIComponent {
     if (edgeOrValue === undefined) {
-      this.styles.padding = "10px"; // Should move to constants
+      this.styles.padding = "10px";
     } else if (typeof edgeOrValue === "number") {
       this.styles.padding = `${edgeOrValue}px`;
     } else {
@@ -106,16 +116,13 @@ export default class UIComponent<TElement = HTMLElement> {
     return this;
   }
 
-  shadowDom(enable: boolean = true): UIComponent {
-    this.useShadowDOM = enable;
-    return this;
-  }
+  style(styles: NonEmptyCSSProperties): UIComponent;
+  style(styles: string): UIComponent;
 
-  style(styles: string | Record<string, any>): UIComponent {
+  style(styles: string | NonEmptyCSSProperties): UIComponent {
     if(typeof styles === "string") {
       this.styleSheet = styles;
     } else if(typeof styles === "object") {
-      // convert to class based styles
       const className = this.generateClassName(`style-${Object.keys(styles).join("-")}`);
       this.styleRules.set(className, styles);
       this.element.classList.add(className);
@@ -124,7 +131,6 @@ export default class UIComponent<TElement = HTMLElement> {
     return this;
   }
 
-  // #region Content methods
   text(content: string | number): UIComponent {
     this.element.textContent = content as string;
     return this;
@@ -144,13 +150,11 @@ export default class UIComponent<TElement = HTMLElement> {
     return `${crypto.randomUUID().substring(0, 8)}-${ruleName}`;
   }
 
-  // Structure method
   add(...components: UIComponent[]): UIComponent {
     this.children.push(...components);
     return this;
   }
 
-  // #region Event handling
   onTap(handler: (e: MouseEvent) => void): UIComponent {
     this.element.addEventListener("click", handler);
     return this;
@@ -177,14 +181,10 @@ export default class UIComponent<TElement = HTMLElement> {
     return this;
   }
 
-
-  // State binding
   bind<T>(state: State<T>, updateFn: (value: T, component: UIComponent) => void): UIComponent {
-    // Initial update
     console.log("Initial update", state.value);
     updateFn(state.value, this);
 
-    // Subscribe to state
     const unsub = state.subscribe(() => updateFn(state.value, this));
     this.stateUnsubscribers.push(unsub);
 
@@ -195,57 +195,44 @@ export default class UIComponent<TElement = HTMLElement> {
     return state.to(this);
   }
 
-
-  // !!Remember: Look up how signals work, and how to implement them
-  // Update the render method to handle class-based styles
   render(): HTMLElement {
-    // First apply any direct styles that weren't converted to classes
     Object.assign(this.element.style, this.styles);
     
-    // Create style element if we have style rules
     if (this.styleRules.size > 0 || this.styleSheet) {
-      const style = document.createElement("style");
-      
-      // Add all class-based rules
+      const styleElement = document.createElement("style");
       let cssText = '';
       
-      // Add our generated style rules
       this.styleRules.forEach((styleObj, className) => {
         cssText += `.${className} {\n`;
         Object.entries(styleObj).forEach(([prop, value]) => {
-          // Convert camelCase to kebab-case
           const cssProp = prop.replace(/([A-Z])/g, '-$1').toLowerCase();
           cssText += `  ${cssProp}: ${value};\n`;
         });
         cssText += '}\n';
+        
+        this.element.classList.add(className);
       });
       
       if (this.styleSheet) {
-        // Scope the styles to this component
-        cssText += this.styleSheet
-          .split('}')
-          .map(rule => rule.trim())
-          .filter(rule => rule.length > 0)
-          .map(rule => {
-            const [selector, ...rest] = rule.split('{');
-            return `.${this.componentId} ${selector.trim()} {${rest.join('{')}}\n`;
-          })
-          .join('}');
+        cssText += this.styleSheet;
       }
       
-      cssText = `@layer components.${this.componentId} {\n${cssText}\n}`;
+      styleElement.textContent = cssText;
       
-      style.textContent = cssText;
-      document.head.appendChild(style);
-      
-      this.stateUnsubscribers.push(() => {
-        document.head.removeChild(style);
-      });
+      if (this.shadowRoot) {
+        this.shadowRoot.insertBefore(styleElement, this.shadowRoot.firstChild);
+      }
     }
     
-    // Continue with the rest of the render process
-    this.children.forEach(child => this.element.appendChild(child.render()));
+    this.children.forEach(child => {
+      const childElement = child.render();
+      this.element.appendChild(childElement);
+    });
     
-    return this.element;
+    return this.customElement;
+  }
+  
+  getShadowRoot(): ShadowRoot | null {
+    return this.shadowRoot;
   }
 }
