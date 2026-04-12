@@ -9,12 +9,6 @@ export default class Color {
     return this.value;
   }
 
-
-  // TODO: Need to manage these better
-  // Thinking of using open props
-  // Getting the iOS default for now, but there's probably a better way to do this. 
-  // Future me problem (～￣▽￣)～.
-  // Common colors as static properties
   static black = new Color("#000000");
   static blue = new Color("#0A84FF");
   static gray = new Color("#8E8E93");
@@ -25,8 +19,6 @@ export default class Color {
   static red = new Color("#FF453A");
   static white = new Color("#FFFFFF");
 
-
-  // Create color with opacity
   opacity(value: number): Color {
     if (this.value.startsWith("#")) {
       const r = parseInt(this.value.slice(1, 3), 16);
@@ -37,11 +29,13 @@ export default class Color {
     }
 
     if (this.value.startsWith("rgb(")) {
-      // Prob a better to do this
-      return new Color(this.value.replace("rgb(", "rgba(").replace(")", `, ${value})`));
+      return new Color(
+        this.value.replace("rgb(", "rgba(").replace(")", `, ${value})`),
+      );
     }
 
-    return new Color(`color-mix(in oklab, ${this.value} ${value * 100}%, transparent)`);
+    return new Color(
+      `color-mix(in oklab, ${this.value} ${value * 100}%, transparent)`,
+    );
   }
-
 }

@@ -5,9 +5,8 @@ export { default as UIComponent } from "./component";
 export { default as State } from "./state";
 export { default as Color } from "./color";
 
-export type EdgeValue = "top" | "bottom" | "leading" | "trailing" | "all" | "horizontal" | "vertical";
-// export type DotEdge = `.${EdgeValue}`;
-
+export type EdgeValue =
+  "top" | "bottom" | "leading" | "trailing" | "all" | "horizontal" | "vertical";
 
 export class Font {
   private value: string;
@@ -17,7 +16,10 @@ export class Font {
   }
 
   toString(): string {
-    return this.value;
+    const [size, ...modifiers] = this.value.split(" ");
+    const weight = modifiers.includes("bold") ? "bold" : "normal";
+    const style = modifiers.includes("italic") ? "italic" : "normal";
+    return `${style} ${weight} ${size} system-ui`;
   }
 
   static largeTitle(): Font {
@@ -48,38 +50,38 @@ export class Font {
     return new Font("0.7rem");
   }
 
-  // #region Modifiers
   bold(): Font {
-    return new Font(`${this.value} bold`)
+    return new Font(`${this.value} bold`);
   }
-
 
   italic(): Font {
     return new Font(`${this.value} italic`);
   }
-
-  // #endregion
-
 }
 
-
-// #region Layout COmponensts 
 export function VStack(...children: UIComponent[]): UIComponent {
-  const stack = new UIComponent().style({ display: "flex", flexDirection: "column", height: "100%" })
+  const stack = new UIComponent().style({
+    display: "flex",
+    flexDirection: "column",
+    height: "100%",
+  });
   return stack.add(...children);
 }
 
 export function HStack(...children: UIComponent[]): UIComponent {
-  const stack = new UIComponent().style({ display: "flex", flexDirection: "row" })
+  const stack = new UIComponent().style({
+    display: "flex",
+    flexDirection: "row",
+  });
   return stack.add(...children);
 }
 
 export function ZStack(...children: UIComponent[]): UIComponent {
-  const stack = new UIComponent().style({ position: "relative" })
+  const stack = new UIComponent().style({ position: "relative" });
 
-  children.forEach((child, index) => {
-    child.style({position: "absolute", inset: "0"})
-  })
+  children.forEach((child) => {
+    child.style({ position: "absolute", inset: "0" });
+  });
 
   return stack.add(...children);
 }
@@ -92,27 +94,20 @@ export function Divider(): UIComponent {
   return new UIComponent("hr").style({ flex: "1", width: "100%" });
 }
 
-// Basic component
 export function Text(content: string = ""): UIComponent {
   return new UIComponent("span").text(content);
 }
 
 export function Button(label: string): UIComponent {
-  return new UIComponent("button")
-    .text(label)
-    .style(/*css*/`
+  return new UIComponent("button").text(label).style(/*css*/ `
       button {
         --bg: #0062CC;
-        --color: #ffffff;
         cursor: pointer;
         border: none;
         color: white;
         border-radius: 6px;
         padding: 8px 16px;
         font-weight: 600;
-        cursor: pointer;
-        outline: none;
-        border: none;
         width: 100%;
         background-color: var(--bg);
 
@@ -124,16 +119,15 @@ export function Button(label: string): UIComponent {
           --bg: #004999;
         }
       }
-    `)
+    `);
 }
 
 export function TextField(placeholder: string = ""): UIComponent {
   const input = new UIComponent("input");
   input.setAttribute("placeholder", placeholder);
   input.setAttribute("type", "text");
-  input.bind
 
-  return input.style(/*css*/`
+  return input.style(/*css*/ `
     input {
       padding: 8px;
       border-radius: 6px;
@@ -146,12 +140,11 @@ export function TextField(placeholder: string = ""): UIComponent {
       outline: none;
       border-color: #007AFF;
     }
-    `)
+    `);
 }
 
 export function Toggle(isOn: State<boolean>): UIComponent {
-  const toggle = new UIComponent('label')
-    .style(/*css*/`
+  const toggle = new UIComponent("label").style(/*css*/ `
       :host {
         position: relative;
         display: inline-block;
@@ -193,20 +186,23 @@ export function Toggle(isOn: State<boolean>): UIComponent {
       }
     `);
 
-  const input = document.createElement('input');
-  input.type = 'checkbox';
+  const input = document.createElement("input");
+  input.type = "checkbox";
   input.checked = isOn.value;
 
-  input.addEventListener('change', () => {
+  const change = () => {
     isOn.value = input.checked;
-  });
+  };
+  input.addEventListener("change", change);
+  toggle.addUnsub(() => input.removeEventListener("change", change));
 
-  // Subscribe to state changes
-  isOn.subscribe(() => {
-    input.checked = isOn.value;
-  });
+  toggle.addUnsub(
+    isOn.subscribe((value) => {
+      input.checked = value;
+    }),
+  );
 
-  const slider = document.createElement('span');
+  const slider = document.createElement("span");
 
   toggle.getElement.appendChild(input);
   toggle.getElement.appendChild(slider);
@@ -214,49 +210,46 @@ export function Toggle(isOn: State<boolean>): UIComponent {
   return toggle;
 }
 
-export function Slider(value: State<number>, range: { min: number, max: number, step: number }): UIComponent {
-  const slider = new UIComponent('input');
+export function Slider(
+  value: State<number>,
+  range: { min: number; max: number; step: number },
+): UIComponent {
+  const slider = new UIComponent("input");
   const element = slider.getElement as HTMLInputElement;
-  element.setAttribute('type', 'range');
-  element.setAttribute('min', range.min.toString());
-  element.setAttribute('max', range.max.toString());
-  element.setAttribute('step', range.step.toString());
+  element.setAttribute("type", "range");
+  element.setAttribute("min", range.min.toString());
+  element.setAttribute("max", range.max.toString());
+  element.setAttribute("step", range.step.toString());
 
-  slider.bind(value, (val, component) => {
-    const _element = component.getElement as HTMLInputElement;
-    _element.value = value.toString();
-  });
-
-  slider.onInput(() => {
-    value.value = parseFloat(element.value);
-  });
+  value.to(slider);
 
   return slider;
 }
 
-// TODO: Might need to make this ImageAsync that can be lazy loaded and can validate it's url.
 export function Image(src: string): UIComponent {
-  return new UIComponent('img').style({ width: '100%', height: '100%' })
-  .setAttribute('src', src);
+  return new UIComponent("img")
+    .style({ width: "100%", height: "100%" })
+    .setAttribute("src", src);
 }
-
 
 export function Link(label: string, href: string): UIComponent {
-  return new UIComponent('a')
+  return new UIComponent("a")
     .text(label)
     .style({
-      color: '#007AFF',
-      textDecoration: 'none'
+      color: "#007AFF",
+      textDecoration: "none",
     })
-    .setAttribute('href', href);
+    .setAttribute("href", href);
 }
 
-// #endregion
-
-
-// Finalé
-export function mount(component: UIComponent, container: HTMLElement | string): () => void {
-  const targetElement = typeof container === "string" ? document.querySelector(container) : container;
+export function mount(
+  component: UIComponent,
+  container: HTMLElement | string,
+): () => void {
+  const targetElement =
+    typeof container === "string"
+      ? document.querySelector(container)
+      : container;
 
   if (!targetElement) {
     throw new Error(`Container element not found: ${container}`);
@@ -268,5 +261,5 @@ export function mount(component: UIComponent, container: HTMLElement | string): 
   return () => {
     component.dispose();
     targetElement.removeChild(renderedElement);
-  }
+  };
 }

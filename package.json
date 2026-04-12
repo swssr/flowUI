@@ -9,8 +9,8 @@
     "watch": "tsc --watch",
     "dev": "vite dev",
     "dev:all": "concurrently \"npm run watch\" \"npm run dev\"",
-    "test": "jest",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "check:state": "tsc checks/state.ts --module commonjs --target ES2020 --strict --outDir .checks && node .checks/checks/state.js"
   },
   "keywords": [
     "ui",
@@ -30,10 +30,7 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@types/jest": "^29.5.5",
     "concurrently": "^9.1.2",
-    "jest": "^29.7.0",
-    "ts-jest": "^29.1.1",
     "typescript": "^5.2.2",
     "vite": "^6.2.1"
   },
@@ -49,5 +46,6 @@
   "bugs": {
     "url": "https://github.com/swssr/flowui/issues"
   },
-  "homepage": "https://github.com/swssr/flowui#readme"
+  "homepage": "https://github.com/swssr/flowui#readme",
+  "packageManager": "pnpm@10.30.3"
 }

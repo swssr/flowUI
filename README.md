@@ -1,336 +1,125 @@
 # FlowUI
 
-A SwiftUI-inspired library for building web interfaces with a fluent API.
-- v0.0.5
+A SwiftUI-inspired library for web interfaces with a fluent API and shadow DOM styles.
 
-> All wishful thing for now :')
+## Install
 
-```typescript
-import { VStack, Text, Button, State, mount } from '@notswssr/flowui';
-
-function Counter() {
-  const count = new State(0);
-  
-  return VStack(
-    Text("Counter")
-      .font(.headline)
-      .padding("bottom", 20),
-      
-    Button("+")
-      .onTap(() => count.value++)
-      .padding(10),
-      
-    Text("0")
-      .bind(count, (value, component) => {
-        component.text(value.toString());
-      })
-  );
-}
-
-mount(Counter(), "#app");
-```
-
-A bit more advance counter with new two data binding
-```typescript
-function CounterExample() {
-    const counter = new State(0);
-
-    const CountButton = (label: string) => Button(label)
-        .padding("all", 10)
-        .foregroundColor(Color.white)
-        .backgroundColor(Color.blue)
-        .frame({ width: "max-content" })
-        .cornerRadius(6)
-
-    return HStack(
-        CountButton("-")
-            .onTap(() => counter.value--),
-
-        Text("Count")
-            .foregroundColor(Color.red)
-            .bindTo(counter),
-
-        CountButton("+")
-            .onTap(() => counter.value++),
-
-        Divider(),
-
-        // You can now transform state into a component e.g text node and also format the value like below
-        counter
-            .format(x => `Hello, the count is: ${x}`)
-            .to(Text("")),
-    )
-    .frame({ width: "100%" })
-}
-
-```
-
-## Features
-
-- 🔗 **Fluent API**: Chainable, SwiftUI-inspired syntax
-- 🧩 **Component Composition**: Build complex UIs from simple components
-- 🔄 **State Management**: Reactive state with simple bindings
-- 🎨 **Theming System**: Light/dark modes and customizable themes
-- ✨ **Animations**: Transitions and animations for dynamic interfaces
-- 📱 **Responsive Design**: Mobile-first grid and layout components
-- 🚀 **No Build Step Required**: Use directly in the browser
-- 🔍 **TypeScript Powered**: Full type safety and autocompletion
-
-## Installation
-
-```bash
+```sh
 npm install @notswssr/flowui
 ```
 
-## Basic Usage
+Use a bundler such as Vite to load the package.
 
-### Creating a Simple Component
-
-```typescript
-import { Text, Button, VStack, mount } from '@notswssr/flowui';
-
-function HelloWorld() {
-  return VStack(
-    Text("Hello, World!")
-      .font(Font.headline())
-      .foregroundColor(Color.blue),
-    Button("Click Me")
-      .onTap(() => alert("Button clicked!"))
-      .padding(10)
-  )
-  .padding(20)
-  .backgroundColor(Color.gray.opacity(0.1))
-  .cornerRadius(10);
-}
-
-mount(HelloWorld(), "#app");
-```
-
-### State Management
+## Counter
 
 ```typescript
-import { Text, Button, VStack, State, mount } from '@notswssr/flowui';
+import {
+  Button,
+  Font,
+  HStack,
+  State,
+  Text,
+  VStack,
+  mount,
+} from "@notswssr/flowui";
 
-function Counter() {
-  // Create state
-  const count = new State(0);
-  
-  // Build UI
-  return VStack(
-    Text("Counter")
-      .font(Font.headline())
-      .padding("bottom", 20),
-      
-    Button("Increment")
-      .onTap(() => count.value++)
-      .padding(10),
-      
-    Text("0")
-      .bind(count, (value, component) => {
-        component.text(value.toString());
-      })
-  );
-}
+const count = new State(0);
 
-mount(Counter(), "#app");
-```
-
-## Core Components
-
-### Layout Components
-
-- **VStack**: Vertical stack layout
-- **HStack**: Horizontal stack layout
-- **ZStack**: Depth stack for overlapping elements
-- **Spacer**: Flexible space
-- **Grid**: Responsive grid layout
-- **ScrollView**: Scrollable container
-
-```typescript
-VStack(
-  Text("Header"),
+const counter = VStack(
+  Text("Counter").font(Font.headline()).padding("bottom", 20),
   HStack(
-    Text("Left"),
-    Spacer(),
-    Text("Right")
+    Button("-").onTap(() => count.value--),
+    Text().to(count).padding("horizontal", 20),
+    Button("+").onTap(() => count.value++),
   ),
-  Grid({ xs: 1, md: 2 }, 16, [
-    Card({ title: "Card 1", content: Text("Content 1") }),
-    Card({ title: "Card 2", content: Text("Content 2") })
-  ])
-)
+).padding(20);
+
+const unmount = mount(counter, "#app");
 ```
 
-### Basic Components
+Call `unmount()` to remove the component and release its state subscriptions.
 
-- **Text**: For displaying text
-- **Button**: Interactive button
-- **TextField**: Text input field
-- **Toggle**: Boolean toggle switch
-- **Image**: Image display with loading state
+## Components
+
+- Layout: `VStack`, `HStack`, `ZStack`, `Spacer`, `Divider`.
+- Content: `Text`, `Image`, `Link`.
+- Controls: `Button`, `TextField`, `Toggle`, `Slider`.
+- Core: `UIComponent`, `State`, `Font`, `Color`, `mount`.
+
+## State
+
+`State` uses `Object.is` to compare values. Replace an object or array to notify subscribers.
+Mutations to the current object do not send notifications.
 
 ```typescript
-VStack(
-  Text("Login Form")
-    .font(Font.headline()),
-    
-  TextField("Username")
-    .padding("bottom", 10),
-    
-  TextField("Password")
-    .padding("bottom", 20),
-    
-  Toggle(rememberMe)
-    .padding("bottom", 20),
-    
-  Button("Sign In")
-    .padding(10)
-    .backgroundColor(Color.blue)
-    .cornerRadius(8)
-)
+import { State, Text, TextField } from "@notswssr/flowui";
+
+const profile = new State({ name: "" });
+profile.value = { ...profile.value, name: "Simo" };
+
+const name = new State("");
+const input = TextField("Name").to(name);
+const greeting = name.format((value) => `Hello, ${value}`).to(Text());
 ```
 
-### Advanced Components
+Automatic bindings use the initial state type:
 
-- **Card**: Container with header, content, and footer
-- **List**: Efficient list for rendering collections
-- **Alert**: Contextual alerts with various types
-- **Modal**: Modal dialog windows
-- **TabView**: Tabbed interface
-- **Divider**: Horizontal rule separator
-- **Form**: Form container with submission handling
+- Strings bind to input values or text content.
+- Numbers bind to number and range inputs or text content.
+- Booleans bind to checkboxes or component visibility.
+- Objects bind to text content as JSON.
+
+Mapped objects bind to style properties. Use an explicit target to select a compatible setter.
 
 ```typescript
-Card({
-  title: "User Profile",
-  subtitle: "Personal information",
-  content: VStack(
-    Image("profile.jpg", { width: 100, height: 100 })
-      .cornerRadius(50),
-      
-    Text("John Doe")
-      .font(Font.headline()),
-      
-    Text("Software Developer")
-      .foregroundColor(Color.gray)
-  ),
-  footer: Button("Edit Profile")
-})
+const color = new State("red");
+color.to(Text("Status"), "foregroundColor");
+color.asStyle("color").to(Text("Status"));
+color.asCssVar("accent").to(Text("Status"));
 ```
 
-## Style Modifiers
+Use `component.bind(state, callback)` for custom updates.
+Use `state.subscribe(callback)` to receive new and old values.
+Both `subscribe` and `effect` return an unsubscribe function.
+`effect` also calls the callback immediately.
 
-Apply styles using chainable modifiers:
+## Styles and events
 
 ```typescript
-Text("Hello World")
-  .font(Font.headline())
+import { Color, Font, Text } from "@notswssr/flowui";
+
+Text("Hello")
+  .font(Font.headline().italic())
   .foregroundColor(Color.blue)
-  .padding(20)
   .backgroundColor(Color.gray.opacity(0.1))
+  .padding("all", 20)
   .cornerRadius(10)
-  .border(Color.blue, 2)
-  .frame({ width: 200, height: 100 })
+  .border(2, Color.blue)
+  .frame({ width: 200, height: 100 });
 ```
 
-Common modifiers:
+`style({ ... })` applies inline styles immediately. Use camelCase, CSS property names, or custom properties.
+`style('...')` sets a stylesheet inside the component's shadow root.
+Later style calls override earlier values for the same property.
+Inline styles take precedence over normal stylesheet rules.
 
-- **padding()**: Add space around content
-- **backgroundColor()**: Set background color
-- **foregroundColor()**: Set text color
-- **font()**: Set font style and size
-- **cornerRadius()**: Round corners
-- **border()**: Add border
-- **frame()**: Set dimensions
-- **style()**: Apply custom CSS
-
-## Animation and Transitions
-
-Add animations to any component:
+`onTap` and `onClick` receive a click event.
+`onInput` and `onChange` receive the input value first and the event second.
 
 ```typescript
-Button("Animated Button")
-  .onTap(() => performAction())
-  .animation(Animation.spring({ stiffness: 100, damping: 10 }))
-```
-
-Add transitions for enter/exit animations:
-
-```typescript
-Text("Fade In Text")
-  .transition(Transition.opacity())
-```
-
-## Theming System
-
-### Using Themes
-
-```typescript
-import { useTheme, VStack, Text, Button } from '@notswssr/flowui';
-
-function ThemeDemo() {
-  const { theme, toggleDarkMode } = useTheme();
-  
-  return VStack(
-    Text(`Current Theme: ${theme.name}`)
-      .foregroundColor(theme.colors.primary),
-      
-    Button(theme.isDark ? "Switch to Light" : "Switch to Dark")
-      .onTap(() => toggleDarkMode())
-  );
-}
-```
-
-### Creating Custom Themes
-
-```typescript
-import { createTheme, Color, applyThemeToDocument } from '@notswssr/flowui';
-
-const customTheme = createTheme({
-  name: 'Custom Theme',
-  colors: {
-    primary: new Color('#6200EE'),
-    secondary: new Color('#03DAC6'),
-    background: new Color('#FAFAFA')
-  }
+TextField("Name").onInput((value) => {
+  name.value = value;
 });
-
-// Apply the custom theme
-applyThemeToDocument(customTheme);
 ```
-
-## Advanced Usage
-
-### Custom Components
-
-Create your own components by composing existing ones:
-
-```## Coming soon``
-
 
 ## Development
 
-### Quick Start
+```sh
+pnpm install --frozen-lockfile
+pnpm dev
+pnpm build
+pnpm check:state
+```
 
-1. Clone the repository
-2. Install dependencies: `pnpm install`
-3. Start development server: `pnpm dev:all`
-
-This will:
-- Start the TypeScript compiler in watch mode
-- Launch a development server at http://localhost:5173
-
-### Development Commands
-
-- `pnpm dev` - Start the development server only
-- `pnpm watch` - Start TypeScript in watch mode only
-- `pnpm dev:all` - Start both simultaneously
-- `pnpm build` - Build the library
-- `pnpm test` - Run tests
-
-### How to Test Components
-
-1. Add your test components to `dev/app.ts`
-2. Create containers in `dev/index.html` 
-3. Mount your components to test them
-4. Changes to source files will automatically reload the page
+The dev server loads source files directly. `pnpm build` emits JavaScript and type declarations to `dist`.
+Use `pnpm watch` to rebuild the package when source files change.

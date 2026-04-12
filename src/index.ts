@@ -1,25 +1,20 @@
 export {
-    // Types
-    type EdgeValue,
-    
-    // Core classes
-    Color,
-    Font,
-    UIComponent,
-    State,
-    
-    // Layout components
-    VStack,
-    HStack,
-    ZStack,
-    Spacer,
-    
-    // Basic components
-    Text,
-    Button,
-    TextField,
-    Toggle,
-    
-    // Utilities
-    mount
-  } from './core';
+  type EdgeValue,
+  Color,
+  Font,
+  UIComponent,
+  State,
+  VStack,
+  HStack,
+  ZStack,
+  Spacer,
+  Text,
+  Button,
+  TextField,
+  Toggle,
+  Divider,
+  Slider,
+  Image,
+  Link,
+  mount,
+} from "./core";
